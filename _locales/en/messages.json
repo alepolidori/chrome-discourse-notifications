@@ -1,0 +1,13 @@
+{
+    "extName": {
+        "message": "Discourse",
+        "description": "Extension name."
+    },
+    "extDescription": {
+        "message": "Displays the number of unread notifications of the specified discourse. You can also click the button to open discourse.",
+        "description": "Extension description."
+    },
+    "save":              { "message": "Save" },
+    "options_saved":     { "message": "Options saved" },
+    "now_just_login_to": { "message": "Now just login to" }
+}

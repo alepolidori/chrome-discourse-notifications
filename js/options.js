@@ -1,0 +1,84 @@
+/**
+ * Author:  Alessandro Polidori
+ * Contact: alessandro.polidori@gmail.com
+ * Description: displays the number of unread notifications of the specified discourse.
+ *              You can also click the button to open discourse.
+ */
+
+/**
+ * Save the options.
+ *
+ * @method saveOptions
+ * @private
+ */
+function saveOptions() {
+    try {
+        var url = document.getElementById('discourse-url').value;
+
+        chrome.storage.sync.set({ discourseUrl: url }, function () {
+
+            // update status to let user know options were saved
+            var status         = document.getElementById('status');
+            status.textContent = chrome.i18n.getMessage('options_saved');
+
+            setTimeout(function () {
+                if (url !== '') {
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(url);
+                    a.appendChild(linkText);
+                    a.href = url;
+                    status.textContent = chrome.i18n.getMessage('now_just_login_to') + ' ';
+                    status.appendChild(a);
+
+                } else {
+                    status.textContent = '';
+                }
+            }, 750);
+
+            chrome.runtime.getBackgroundPage(function (bg) {
+                bg.DiscourseCommunity.init(function () {
+                    bg.DiscourseCommunity.restart();
+                });
+            });
+        });
+    } catch (err) {
+        console.error(err.stack);
+    }
+}
+
+/**
+ * Restores the options initializing the gui.
+ *
+ * @method restoreOptions
+ * @private
+ */
+function restoreOptions() {
+
+    chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
+        document.getElementById('discourse-url').value = items.discourseUrl;
+    });
+}
+
+/**
+ * Initialize some gui components.
+ *
+ * @method init
+ * @private
+ */
+function init() {
+    try {
+        document.getElementById('save').innerHTML = chrome.i18n.getMessage('save');
+        restoreOptions();
+        document.getElementById('discourse-url').focus();
+    } catch (err) {
+        console.error(err.stack);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+document.getElementById('save').addEventListener('click', saveOptions);
+document.getElementById('discourse-url').addEventListener("keyup", function (e) {
+    if (e.keyCode === 13) { // checks whether the pressed key is "Enter"
+        saveOptions();
+    }
+});
