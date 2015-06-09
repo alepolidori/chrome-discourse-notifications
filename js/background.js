@@ -84,16 +84,17 @@ var DiscourseCommunity = (function () {
 
             chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
                 try {
+                    chrome.browserAction.onClicked.removeListener(openOptionsTab);
+                    chrome.browserAction.onClicked.removeListener(openDiscourseTab);
+                    
                     if (items.discourseUrl !== '' && typeof items.discourseUrl === 'string') {
                         initialized = true;
                         setUrlCommunity(items.discourseUrl);
-                        chrome.browserAction.onClicked.removeListener(openOptionsTab);
                         chrome.browserAction.onClicked.addListener(openDiscourseTab);
 
                     } else {
                         initialized = false;
                         chrome.browserAction.setIcon({ path: chrome.extension.getURL('../img/logo_bn19.png') });
-                        chrome.browserAction.onClicked.removeListener(openDiscourseTab);
                         chrome.browserAction.onClicked.addListener(openOptionsTab);
                     }
                     if (cb) { cb(); }
