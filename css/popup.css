@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.notifications {
+  width: 320px;
+  min-height: 60px;
+  marign: 0.5em 0;
+  font-size: 12px;
+}
+
+.notification {
+  display: block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+}
+
+.notification:hover {
+  background-color: rgb(240, 240, 240);
+}
+
+.notification-username {
+  margin-right: 0.5em;
+  color: #222;
+}
+.notification-title {
+  color: #08c;
+}
