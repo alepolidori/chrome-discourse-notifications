@@ -21,6 +21,7 @@ body {
 
 .notification.unread {
   background: #e0f5ff;
+  font-weight: bold;
 }
 
 .notification:hover {
