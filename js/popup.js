@@ -28,8 +28,10 @@ var appendUrl = function(discourseUrl, n) {
 };
 
 var template = function(n) {
+  var classes = 'notification js-notification-link';
+  if (!n.read) classes += ' unread';
   return [
-    '<a href="' + n.url + '" class="notification js-notification-link">',
+    '<a href="' + n.url + '" class="' + classes + '">',
       '<span class="notification-username">',
         n.data.display_username,
       '</span>',

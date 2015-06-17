@@ -19,6 +19,10 @@ body {
   text-decoration: none;
 }
 
+.notification.unread {
+  background: #e0f5ff;
+}
+
 .notification:hover {
   background-color: rgb(240, 240, 240);
 }
