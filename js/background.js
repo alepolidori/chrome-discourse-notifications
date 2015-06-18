@@ -97,6 +97,9 @@ var DiscourseCommunity = (function () {
                     
                     if (items.discourseUrl !== '' && typeof items.discourseUrl === 'string') {
                         initialized = true;
+                        if (items.discourseUrl.slice(-1) !== '/') {
+                            items.discourseUrl += '/';
+                        }
                         setUrlCommunity(items.discourseUrl);
                         chrome.browserAction.onClicked.addListener(openDiscourseTab);
 
