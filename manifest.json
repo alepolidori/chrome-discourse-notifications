@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extName__",
     "description": "__MSG_extDescription__",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "author": "Alessandro Polidori",
     "manifest_version": 2,
     "default_locale": "en",
@@ -13,6 +13,7 @@
     "background": {
         "scripts": [
             "lib/jquery-2.1.3.min.js",
+            "lib/message-bus.js",
             "js/background.js"
         ]
     },

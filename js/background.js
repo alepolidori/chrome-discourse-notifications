@@ -13,6 +13,22 @@
 var DiscourseCommunity = (function () {
 
     /**
+     * User identifier.
+     *
+     * @property userId
+     * @type number
+     */
+    var userId;
+
+    /**
+     * Total unread notification counter.
+     *
+     * @property totUnreadCounter
+     * @type number
+     */
+    var totUnreadCounter;
+
+    /**
      * Url to open when click the icon.
      *
      * @property urlCommunity
@@ -39,30 +55,22 @@ var DiscourseCommunity = (function () {
     var debug = false;
 
     /**
-     * Interval time to update the notifications counter.
-     *
-     * @property intervalPolling
-     * @type number
-     * @default 10 seconds
-     */
-    var intervalPolling = 10000;
-
-    /**
-     * Interval time to update the notifications counter when some error occurs.
-     *
-     * @property intervalPolling
-     * @type number
-     * @default 8 seconds
-     */
-    var errorIntervalPolling = 8000;
-
-    /**
      * Timeout identifier.
      *
-     * @property idTimeoutUpdate
+     * @property idTimeoutLogin
      * @type number
      */
-    var idTimeoutUpdate;
+    var idTimeoutLogin;
+
+    /**
+     * Interval time to use to check current user data again after a failure
+     * for not logged in user into the community.
+     *
+     * @property noLoggedInIntervalPolling
+     * @type number
+     * @default 1 minute
+     */
+    var noLoggedInIntervalPolling = 60000;
 
     /**
      * The options page url.
@@ -117,19 +125,117 @@ var DiscourseCommunity = (function () {
     }
 
     /**
-     * Start the update of the notifications counter.
+     * Start getting json initial data and subscribe for polling.
      *
      * @method start
      */
     function start() {
         try {
             if (initialized === true) {
-                updateBadge();
-                if (debug) { console.log('updating started'); }
-
+                getCurrentUserData(function (err) {
+                    if (err) { setTotUnreadCounter(err); }
+                    else     { startPolling(); }
+                });
             } else {
                 if (debug) { console.log('specify a discourse url in the option page'); }
             }
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Get json data about the current logged in user.
+     *
+     * @method getCurrentUserData
+     * @param {function} cb The callback function
+     * @private
+     */
+    function getCurrentUserData(cb) {
+        try {
+            var url = urlCommunity + '/session/current.json';
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                cache: false,
+                dataType: 'json'
+
+            }).done(function (data, textStatus, jqXHR) {
+                try {
+                    if (   typeof data === 'object'
+                        && typeof data.current_user === 'object'
+                        && typeof data.current_user.id === 'number'
+                        && typeof data.current_user.unread_notifications === 'number'
+                        && typeof data.current_user.unread_private_messages === 'number') {
+
+                        userId = data.current_user.id;
+                        if (debug) { console.log('user id: ' + userId); }
+
+                        var totUnreadCounter = data.current_user.unread_notifications + data.current_user.unread_private_messages;
+                        setTotUnreadCounter(totUnreadCounter);
+                        cb(null);
+
+                    } else {
+                        // maybe data format has been changed
+                        console.warn('no current_user data from: ' + url);
+                        cb('?');
+                    }
+                } catch (err) {
+                    console.error(err.stack);
+                    cb('?');
+                }
+
+            }).fail(function (jqHXR, textStatus, errorThrown) {
+                try {
+                    // user is not logged into community or other errors
+                    console.warn(url + ' failed: try to login to ' + urlCommunity);
+                    cb('...');
+                    idTimeoutLogin = setTimeout(start, noLoggedInIntervalPolling);
+
+                } catch (err) {
+                    console.error(err.stack);
+                    cb('?');
+                }
+            });
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Start polling using MessageBus.
+     *
+     * @method startPolling
+     * @private
+     */
+    function startPolling() {
+        try {
+            MessageBus.baseUrl = urlCommunity;
+            MessageBus.start();
+            if (debug) { console.log('MessageBus started with baseUrl: ' + MessageBus.baseUrl); }
+
+            MessageBus.subscribe("/notification/" + userId, function (data) {
+                try {
+                    if (debug) { console.log('/notification/' + userId + ' - received data:', data); }
+
+                    if (   typeof data === 'object'
+                        && typeof data.unread_notifications === 'number'
+                        && typeof data.unread_private_messages === 'number') {
+
+                        var totUnreadCounter = data.unread_notifications + data.unread_private_messages;
+                        setTotUnreadCounter(totUnreadCounter);
+
+                    } else {
+                        throw new Error('/notification/' + userId + ': received unknown data');
+                    }
+                } catch (err) {
+                    console.error(err.stack);
+                    setTotUnreadCounter('?');
+                }
+            });
+            if (debug) { console.log('MessageBus subscribed "/notification/' + userId  + '"'); }
+
         } catch (err) {
             console.error(err.stack);
         }
@@ -142,9 +248,9 @@ var DiscourseCommunity = (function () {
      */
     function stop() {
         try {
-            clearTimeout(idTimeoutUpdate);
-            idTimeoutUpdate = undefined;
-            if (debug) { console.log('updating stopped'); }
+            clearTimeout(idTimeoutLogin);
+            MessageBus.stop();
+            if (debug) { console.log('MessageBus stopped'); }
 
         } catch (err) {
             console.error(err.stack);
@@ -180,35 +286,6 @@ var DiscourseCommunity = (function () {
     }
 
     /**
-     * Change the update interval polling and restart the update service.
-     *
-     * @method setIntervalPolling
-     * @param {number} value The interval time in milliseconds
-     */
-    function setIntervalPolling(value) {
-        try {
-            intervalPolling = value;
-            if (idTimeoutUpdate) { restart(); }
-        } catch (err) {
-            console.error(err.stack);
-        }
-    }
-
-    /**
-     * Returns the timeout id.
-     *
-     * @method getIdTimeoutUpdate
-     * @return {number} The timeout id.
-     */
-    function getIdTimeoutUpdate() {
-        try {
-            return idTimeoutUpdate;
-        } catch (err) {
-            console.error(err.stack);
-        }
-    }
-
-    /**
      * Returns the url of Discourse community.
      *
      * @method getUrlCommunity
@@ -217,6 +294,20 @@ var DiscourseCommunity = (function () {
     function getUrlCommunity() {
         try {
             return urlCommunity;
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Returns the timeout id.
+     *
+     * @method getIdTimeoutLogin
+     * @return {number} The timeout id.
+     */
+    function getIdTimeoutLogin() {
+        try {
+            return idTimeoutLogin;
         } catch (err) {
             console.error(err.stack);
         }
@@ -238,22 +329,30 @@ var DiscourseCommunity = (function () {
     }
 
     /**
-     * Gets the total Discourse community notifications number and update the graphic display.
+     * Sets the total unread notification counter.
      *
-     * @method updateBadge
-     * @private
+     * @method setTotUnreadCounter
+     * @param {string} value The value to be set
      */
-    function updateBadge() {
+    function setTotUnreadCounter(value) {
         try {
-            if (debug) { console.log('update badge'); }
-            getDiscourseCommunityNotifications(function (value) {
-                try {
-                    chrome.browserAction.setBadgeText({ text: value.toString() });
-                } catch (err) {
-                    console.error(err.stack);
-                    chrome.browserAction.setBadgeText({ text: '?' });
-                }
-            });
+            if (typeof value !== 'string' && typeof value !== 'number') {
+                throw new Error('wrong counter value: ' + value);
+            }
+
+            if (isNaN(parseInt(value))) {
+                chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo_bn19.png') });
+            } else {
+                chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo19.png') });
+            }
+
+            value = (value === 0 ? "" : value);
+
+            if (debug)  { console.log('set total unread counter: "' + value + '"'); }
+
+            totUnreadCounter = value.toString();
+            chrome.browserAction.setBadgeText({ text: totUnreadCounter });
+
         } catch (err) {
             console.error(err.stack);
             chrome.browserAction.setBadgeText({ text: '?' });
@@ -261,68 +360,9 @@ var DiscourseCommunity = (function () {
     }
 
     /**
-     * Gets the total number of Discourse community notifications.
-     *
-     * @method getDiscourseCommunityNotifications
-     * @param {function} cb The Callback function to call on ajax completion
-     * @private
-     */
-    function getDiscourseCommunityNotifications(cb) {
-        try {
-            $.ajax({
-                url:   urlCommunity,
-                type:  'GET',
-                cache: false
-
-            }).done(function (data, textStatus, jqXHR) {
-                try {
-                    var pos = data.indexOf('currentUser');
-
-                    if (pos < 0) {
-                        // user is not logged into community or data format has been changed
-                        chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo_bn19.png') });
-                        tot = '';
-
-                    } else {
-                        pos         = pos + 'currentUser",'.length;
-                        var val     = data.substring(pos, data.length);
-                        var val     = val.split('});')[0] + '}';
-                        var jsonObj = JSON.parse(val);
-                        var tot     = jsonObj.unread_notifications + jsonObj.unread_private_messages;
-
-                        if (tot === 0) { tot = ''; }
-
-                        chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo19.png') });
-                    }
-                    cb(tot);
-                    idTimeoutUpdate = setTimeout(updateBadge, intervalPolling);
-
-                } catch (err) {
-                    console.error(err.stack);
-                    cb('?');
-                }
-
-            }).fail(function (jqHXR, textStatus, errorThrown) {
-                try {
-                    console.error(textStatus);
-                    cb('...');
-                    idTimeoutUpdate = setTimeout(updateBadge, errorIntervalPolling);
-
-                } catch (err) {
-                    console.error(err.stack);
-                    cb('?');
-                }
-            });
-        } catch (err) {
-            console.error(err.stack);
-            cb('?');
-        }
-    }
-
-    /**
      * Returns true if the extension has been initialized.
      *
-     * @method start
+     * @method isInitialized
      * @return {boolean} True if the extension has been initialized.
      */
     function isInitialized() {
@@ -366,19 +406,21 @@ var DiscourseCommunity = (function () {
     }
 
     return {
-        init:               init,
-        stop:               stop,
-        start:              start,
-        restart:            restart,
-        setDebug:           setDebug,
-        isInitialized:      isInitialized,
-        getUrlCommunity:    getUrlCommunity,
-        getIdTimeoutUpdate: getIdTimeoutUpdate,
-        setIntervalPolling: setIntervalPolling
+        init:                init,
+        stop:                stop,
+        start:               start,
+        restart:             restart,
+        setDebug:            setDebug,
+        isInitialized:       isInitialized,
+        getUrlCommunity:     getUrlCommunity,
+        getIdTimeoutLogin:   getIdTimeoutLogin,
+        setTotUnreadCounter: setTotUnreadCounter
     };
 
 })();
 
-DiscourseCommunity.init(function () {
-    DiscourseCommunity.start();
+$(function () {
+    DiscourseCommunity.init(function () {
+        DiscourseCommunity.start();
+    });
 });
