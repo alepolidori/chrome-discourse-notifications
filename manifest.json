@@ -33,6 +33,7 @@
         "default_icon": {
             "19": "img/logo_bn19.png",
             "38": "img/logo38.png"
-        }
+        },
+        "default_popup": "popup.html"
     }
 }
