@@ -1,9 +1,15 @@
 
+// Ensures the base Discourse URL *does not* have an trailing slash
+var normalizeBaseUrl = function(url) {
+  var lastCharPos = url.length - 1;
+  var hasSlash = url[lastCharPos] === '/';
+  return hasSlash ? url.substr(0, lastCharPos) : url;
+};
+
 var buildNotificationsUrl = function(discourseUrl) {
   return [
     discourseUrl,
-    ( discourseUrl[discourseUrl.length - 1] !== '/' ? '/' : '' ),
-    'notifications?',
+    '/notifications?',
     'recent=true'
   ].join('');
 };
@@ -57,7 +63,7 @@ var initLinks = function() {
 
 chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
 
-  var discourseUrl = items.discourseUrl;
+  var discourseUrl = normalizeBaseUrl(items.discourseUrl);
 
   getNotificaitons(discourseUrl).then(function(data) {
 
