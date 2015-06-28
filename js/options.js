@@ -1,8 +1,6 @@
 /**
  * Author:  Alessandro Polidori
  * Contact: alessandro.polidori@gmail.com
- * Description: displays the number of unread notifications of the specified discourse.
- *              You can also click the button to open discourse.
  */
 
 /**

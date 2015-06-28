@@ -1,7 +1,7 @@
-Chrome Discourse
-================
+Chrome Discourse Notifications
+==============================
 
-A Google Chrome extension that shows unread notifications counter of your specified Discourse community account.
+A Google Chrome extension that shows notifications of your specified Discourse community account.
 
 Installation
 ============
