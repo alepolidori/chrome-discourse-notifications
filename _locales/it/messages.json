@@ -4,7 +4,7 @@
         "description": "Nome dell'estensione."
     },
     "extDescription": {
-        "message": "Visualizza il numero di notifiche non lette presenti sul discourse configurato. Puoi anche cliccare il pulsante per accedere a discourse.",
+        "message": "Visualizza le notifiche del discourse configurato.",
         "description": "Descrizione dell'estensione."
     },
     "save":              { "message": "Salva" },
