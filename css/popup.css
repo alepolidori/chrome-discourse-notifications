@@ -21,7 +21,7 @@ body {
 
 .notification {
   display: block;
-  padding: 0.5em 1em;
+  padding: 0.5em 0.5em;
   text-decoration: none;
 }
 
@@ -40,4 +40,10 @@ body {
 }
 .notification-title {
   color: #08c;
+}
+.notification i {
+  margin-right: 5px;
+}
+.notification .fa {
+  color: #919191;
 }
