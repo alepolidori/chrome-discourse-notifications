@@ -75,7 +75,7 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', init);
 document.getElementById('save').addEventListener('click', saveOptions);
-document.getElementById('discourse-url').addEventListener("keyup", function (e) {
+document.getElementById('discourse-url').addEventListener('keyup', function (e) {
     if (e.keyCode === 13) { // checks whether the pressed key is "Enter"
         saveOptions();
     }

@@ -14,7 +14,7 @@ var buildNotificationsUrl = function(discourseUrl) {
   ].join('');
 };
 
-var getNotificaitons = function(discourseUrl) {
+var getNotifications = function(discourseUrl) {
 
   var url = buildNotificationsUrl(discourseUrl);
   var options = {
@@ -25,7 +25,8 @@ var getNotificaitons = function(discourseUrl) {
   };
 
   return fetch(url, options)
-          .then(function(res) { return res.json(); });
+          .then (function (res) { return res; })
+          .catch(function (err) { return err; });
 };
 
 var appendUrl = function(discourseUrl, n) {
@@ -42,7 +43,7 @@ var iconClassMap = {
   5:  'fa-heart',
   9:  'fa-reply',
   12: 'fa-certificate'
-}
+};
 
 var extractData = function (n) {
   n.popNot = { icon: iconClassMap[n.notification_type] };
@@ -54,7 +55,7 @@ var extractData = function (n) {
     n.popNot.value = '\'' + n.data.badge_name + '\'';
   }
   return n;
-}
+};
 
 var template = function(n) {
   var classes = 'notification js-notification-link';
@@ -94,6 +95,24 @@ var olderTemplate = function(discourseUrl) {
   ].join('');
 };
 
+var doLoginTemplate = function (discourseUrl) {
+  try {
+    var classes = 'notification js-notification-link';
+    return [
+      '<a href="' + discourseUrl + '" class="' + classes + '">',
+        '<span class="notification-username">',
+          'You need to login to',
+        '</span>',
+        '<span class="notification-title">',
+          discourseUrl,
+        '</span>',
+      '</a>'
+    ].join('');
+  } catch (err) {
+    console.error(err.stack);
+  }
+};
+
 var initLinks = function() {
   var links = document.querySelectorAll('a[href]');
 
@@ -111,17 +130,70 @@ chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
 
   var discourseUrl = normalizeBaseUrl(items.discourseUrl);
 
-  getNotificaitons(discourseUrl).then(function(data) {
+  getNotifications(discourseUrl).then(function (res) {
+    if (res.json) {
+      res.json().then(function (data) {
+        var html;
+        if (res.ok === true && res.status === 200) {
 
-      var html = homeTemplate(discourseUrl);
-      html += data.notifications.map(appendUrl.bind(null, discourseUrl))
-                                   .map(extractData)
-                                   .map(template)
-                                   .join('');
-      html += olderTemplate(discourseUrl);
+          html = homeTemplate(discourseUrl);
+          html += data.notifications.map(appendUrl.bind(null, discourseUrl))
+            .map(extractData)
+            .map(template)
+            .join('');
+          html += olderTemplate(discourseUrl);
 
-      document.querySelector('.js-notifications').innerHTML = html;
-      initLinks();
-    });
+          document.querySelector('.js-notifications').innerHTML = html;
+          initLinks();
+          showNotificationsPage();
+          chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo19.png') });
+          chrome.browserAction.setBadgeText({ text: '' });
 
+        } else {
+          showDoLoginPage(discourseUrl);
+          chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/logo_bn19.png') });
+          chrome.browserAction.setBadgeText({ text: '...' });
+        }
+      }).catch(function (err) {
+        console.error(err.stack);
+      });
+    } else {
+      showDoLoginPage(discourseUrl);
+    }
+  }).catch(function (err) {
+    console.error(err.stack);
+  });
 });
+
+function hideAllPages() {
+  try {
+    var sectionEls = document.querySelectorAll('section');
+    var i;
+    for (i = 0; i < sectionEls.length; i++) {
+      sectionEls[i].classList.add('hidePage');
+    }
+  } catch (err) {
+    console.error(err.stack);
+  }
+}
+
+function showDoLoginPage(discourseUrl) {
+  try {
+    var html = doLoginTemplate(discourseUrl);
+    document.querySelector('.do-login-page').innerHTML = html;
+    initLinks();
+    hideAllPages();
+    document.querySelector('.do-login-page').classList.remove('hidePage');
+  } catch (err) {
+    console.error(err.stack);
+  }
+}
+
+function showNotificationsPage() {
+  try {
+    hideAllPages();
+    document.querySelector('.notifications-page').classList.remove('hidePage');
+  } catch (err) {
+    console.error(err.stack);
+  }
+}

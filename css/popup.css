@@ -5,14 +5,14 @@
 html,
 body {
   min-height: 300px;
-  overflow: scroll;
+  /*overflow: scroll;*/
 }
 
-body {
+html {
   margin: 0;
 }
 
-.notifications {
+section {
   width: 320px;
   min-height: 60px;
   marign: 0.5em 0;
@@ -46,4 +46,8 @@ body {
 }
 .notification .fa {
   color: #919191;
+}
+
+.hidePage {
+    display: none;
 }

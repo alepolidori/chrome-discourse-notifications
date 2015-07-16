@@ -79,6 +79,23 @@ var DiscourseCommunity = (function () {
     var optionsUrl = chrome.extension.getURL('options.html');
 
     /**
+     * Ensures the base Discourse URL *does not* have an trailing slash
+     *
+     * @method normalizeBaseUrl
+     * @param {string} url The url to be normalized
+     */
+    var normalizeBaseUrl = function (url) {
+        try {
+            var lastCharPos = url.length - 1;
+            var hasSlash    = url[lastCharPos] === '/';
+            return hasSlash ? url.substr(0, lastCharPos) : url;
+        } catch (err) {
+            console.error(err.stack);
+            return url;
+        }
+    };
+
+    /**
      * Initialize.
      *
      * @method init
@@ -90,16 +107,14 @@ var DiscourseCommunity = (function () {
 
             chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
                 try {
+                    chrome.browserAction.setPopup({ popup: '' });
                     chrome.browserAction.onClicked.removeListener(openOptionsTab);
-                    chrome.browserAction.onClicked.removeListener(openDiscourseTab);
-                    
+
                     if (items.discourseUrl !== '' && typeof items.discourseUrl === 'string') {
                         initialized = true;
-                        if (items.discourseUrl.slice(-1) !== '/') {
-                            items.discourseUrl += '/';
-                        }
+                        items.discourseUrl = normalizeBaseUrl(items.discourseUrl);
                         setUrlCommunity(items.discourseUrl);
-                        chrome.browserAction.onClicked.addListener(openDiscourseTab);
+                        chrome.browserAction.setPopup({ popup: '../popup.html' });
 
                     } else {
                         initialized = false;
@@ -164,11 +179,11 @@ var DiscourseCommunity = (function () {
 
             }).done(function (data, textStatus, jqXHR) {
                 try {
-                    if (   typeof data === 'object'
-                        && typeof data.current_user === 'object'
-                        && typeof data.current_user.id === 'number'
-                        && typeof data.current_user.unread_notifications === 'number'
-                        && typeof data.current_user.unread_private_messages === 'number') {
+                    if (typeof data === 'object' &&
+                        typeof data.current_user === 'object' &&
+                        typeof data.current_user.id === 'number' &&
+                        typeof data.current_user.unread_notifications === 'number' &&
+                        typeof data.current_user.unread_private_messages === 'number') {
 
                         userId = data.current_user.id;
                         if (debug) { console.log('user id: ' + userId); }
@@ -212,7 +227,7 @@ var DiscourseCommunity = (function () {
      */
     function startPolling() {
         try {
-            MessageBus.baseUrl = urlCommunity;
+            MessageBus.baseUrl = urlCommunity + '/';
             MessageBus.start();
             if (debug) { console.log('MessageBus started with baseUrl: ' + MessageBus.baseUrl); }
 
@@ -220,9 +235,9 @@ var DiscourseCommunity = (function () {
                 try {
                     if (debug) { console.log('/notification/' + userId + ' - received data:', data); }
 
-                    if (   typeof data === 'object'
-                        && typeof data.unread_notifications === 'number'
-                        && typeof data.unread_private_messages === 'number') {
+                    if (typeof data === 'object' &&
+                        typeof data.unread_notifications === 'number' &&
+                        typeof data.unread_private_messages === 'number') {
 
                         var totUnreadCounter = data.unread_notifications + data.unread_private_messages;
                         setTotUnreadCounter(totUnreadCounter);
@@ -397,9 +412,12 @@ var DiscourseCommunity = (function () {
     function openOptionsTab() {
         try {
             chrome.tabs.query({ url: optionsUrl }, function (tabs) {
-
-                if (tabs.length) { chrome.tabs.update(tabs[0].id, { active: true }); }
-                else             { chrome.tabs.create({url: optionsUrl});            }
+                if (tabs.length) {
+                    chrome.tabs.update(tabs[0].id, { active: true });
+                    chrome.tabs.reload(tabs[0].id);
+                } else {
+                    chrome.tabs.create({url: optionsUrl});
+                }
             });
         } catch (err) {
             console.error(err.stack);
