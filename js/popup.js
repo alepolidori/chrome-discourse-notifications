@@ -120,7 +120,7 @@ var initLinks = function() {
     link.addEventListener('click', function(e) {
       e.preventDefault();
 
-      chrome.tabs.create({ url: e.currentTarget.href });
+      chrome.tabs.create({ url: e.currentTarget.href, active: false });
 
     }, false);
   });
