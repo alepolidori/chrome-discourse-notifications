@@ -1,3 +1,4 @@
+var alebg = chrome.extension.getBackgroundPage();
 
 // Ensures the base Discourse URL *does not* have an trailing slash
 var normalizeBaseUrl = function(url) {

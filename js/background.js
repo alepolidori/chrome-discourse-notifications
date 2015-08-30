@@ -11,6 +11,15 @@
 var DiscourseCommunity = (function () {
 
     /**
+     * The identifier.
+     *
+     * @property ID
+     * @type string
+     * @default "DiscourseCommunity"
+     */
+    var ID = 'DiscourseCommunity';
+
+    /**
      * User identifier.
      *
      * @property userId
@@ -105,8 +114,13 @@ var DiscourseCommunity = (function () {
         try {
             chrome.browserAction.setBadgeText({ text: '' });
 
-            chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
+            chrome.storage.sync.get({
+                discourseUrl: '',
+                desktopNotificationsEnabled: true
+            }, function (items) {
                 try {
+                    ChrNotifications.toEnable = items.desktopNotificationsEnabled;
+
                     chrome.browserAction.setPopup({ popup: '' });
                     chrome.browserAction.onClicked.removeListener(openOptionsTab);
 
@@ -133,7 +147,7 @@ var DiscourseCommunity = (function () {
                 if (details.reason === 'install') { openOptionsTab(); }
             });
 
-            if (debug) { console.log('initialized'); }
+            logger(ID, 'initialized');
 
         } catch (err) {
             console.error(err.stack);
@@ -147,13 +161,14 @@ var DiscourseCommunity = (function () {
      */
     function start() {
         try {
+            logger(ID, 'start');
             if (initialized === true) {
                 getCurrentUserData(function (err) {
                     if (err) { setTotUnreadCounter(err); }
                     else     { startPolling(); }
                 });
             } else {
-                if (debug) { console.log('specify a discourse url in the option page'); }
+                logger(ID, 'specify a discourse url in the option page');
             }
         } catch (err) {
             console.error(err.stack);
@@ -186,7 +201,7 @@ var DiscourseCommunity = (function () {
                         typeof data.current_user.unread_private_messages === 'number') {
 
                         userId = data.current_user.id;
-                        if (debug) { console.log('user id: ' + userId); }
+                        logger(ID, 'get user id: ' + userId);
 
                         var totUnreadCounter = data.current_user.unread_notifications + data.current_user.unread_private_messages;
                         setTotUnreadCounter(totUnreadCounter);
@@ -194,7 +209,7 @@ var DiscourseCommunity = (function () {
 
                     } else {
                         // maybe data format has been changed
-                        console.warn('no current_user data from: ' + url);
+                        warn(ID, 'no current_user data from: ' + url);
                         cb('?');
                     }
                 } catch (err) {
@@ -205,7 +220,7 @@ var DiscourseCommunity = (function () {
             }).fail(function (jqHXR, textStatus, errorThrown) {
                 try {
                     // user is not logged into community or other errors
-                    console.warn(url + ' failed: try to login to ' + urlCommunity);
+                    warn(ID, url + ' failed: try to login to ' + urlCommunity);
                     cb('...');
                     idTimeoutLogin = setTimeout(start, noLoggedInIntervalPolling);
 
@@ -229,11 +244,16 @@ var DiscourseCommunity = (function () {
         try {
             MessageBus.baseUrl = urlCommunity + '/';
             MessageBus.start();
-            if (debug) { console.log('MessageBus started with baseUrl: ' + MessageBus.baseUrl); }
+            logger(ID, 'MessageBus started with baseUrl: ' + MessageBus.baseUrl);
 
+            // to avoid more listeners
+            MessageBus.unsubscribe('/notification/*');
+            logger(ID, 'MessageBus unsubscribed "/notification/*"');
+
+            // returns unread notifications and unread private message numbers
             MessageBus.subscribe("/notification/" + userId, function (data) {
                 try {
-                    if (debug) { console.log('/notification/' + userId + ' - received data:', data); }
+                    logger(ID, '/notification/' + userId + ' - received data:', data);
 
                     if (typeof data === 'object' &&
                         typeof data.unread_notifications === 'number' &&
@@ -250,7 +270,10 @@ var DiscourseCommunity = (function () {
                     setTotUnreadCounter('?');
                 }
             });
-            if (debug) { console.log('MessageBus subscribed "/notification/' + userId  + '"'); }
+            logger(ID, 'MessageBus subscribed "/notification/' + userId  + '"');
+
+            if (ChrNotifications.toEnable === true) { ChrNotifications.enable(userId); }
+            else { ChrNotifications.disable(); }
 
         } catch (err) {
             console.error(err.stack);
@@ -265,9 +288,7 @@ var DiscourseCommunity = (function () {
     function stop() {
         try {
             clearTimeout(idTimeoutLogin);
-            MessageBus.stop();
-            if (debug) { console.log('MessageBus stopped'); }
-
+            logger(ID, 'stop');
         } catch (err) {
             console.error(err.stack);
         }
@@ -280,6 +301,7 @@ var DiscourseCommunity = (function () {
      */
     function restart() {
         try {
+            logger(ID, 'restart');
             stop();
             start();
         } catch (err) {
@@ -296,6 +318,56 @@ var DiscourseCommunity = (function () {
     function setDebug(value) {
         try {
             debug = value;
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Returns true if the debug is enabled.
+     *
+     * @method debugEnabled
+     * @return {boolean} True if the debug is enabled.
+     */
+    function debugEnabled() {
+        try {
+            return debug;
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Log function.
+     *
+     * @method logger
+     * @param {string} id  The component identifier
+     * @param {string} str The output message
+     * @param {object} obj An object to print
+     */
+    function logger(id, str, obj) {
+        try {
+            if (debug) {
+                console.log('[' + id + '] - ' + str);
+                if (obj) { console.log(obj); }
+            }
+        } catch (err) {
+            console.error(err.stack);
+        }
+    }
+
+    /**
+     * Log warning message.
+     *
+     * @method warn
+     * @param {string} id  The component identifier
+     * @param {string} str The output message
+     * @param {object} obj An object to print
+     */
+    function warn(id, str, obj) {
+        try {
+            console.warn('[' + id + '] - ' + str);
+            if (obj) { console.warn(obj); }
         } catch (err) {
             console.error(err.stack);
         }
@@ -364,7 +436,7 @@ var DiscourseCommunity = (function () {
 
             value = (value === 0 ? "" : value);
 
-            if (debug)  { console.log('set total unread counter: "' + value + '"'); }
+            logger(ID, 'set total unread counter: "' + value + '"');
 
             totUnreadCounter = value.toString();
             chrome.browserAction.setBadgeText({ text: totUnreadCounter });
@@ -427,9 +499,12 @@ var DiscourseCommunity = (function () {
     return {
         init:                init,
         stop:                stop,
+        warn:                warn,
         start:               start,
+        logger:              logger,
         restart:             restart,
         setDebug:            setDebug,
+        debugEnabled:        debugEnabled,
         isInitialized:       isInitialized,
         getUrlCommunity:     getUrlCommunity,
         getIdTimeoutLogin:   getIdTimeoutLogin,

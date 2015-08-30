@@ -11,9 +11,13 @@
  */
 function saveOptions() {
     try {
+        var desktopNotificationsEnabled = (document.getElementById('desktop-notifications-enabler')).checked;
         var url = document.getElementById('discourse-url').value;
 
-        chrome.storage.sync.set({ discourseUrl: url }, function () {
+        chrome.storage.sync.set({
+            discourseUrl: url,
+            desktopNotificationsEnabled: desktopNotificationsEnabled
+        }, function () {
 
             // update status to let user know options were saved
             var status         = document.getElementById('status');
@@ -34,6 +38,9 @@ function saveOptions() {
             }, 750);
 
             chrome.runtime.getBackgroundPage(function (bg) {
+
+                bg.ChrNotifications.toEnable = desktopNotificationsEnabled;
+
                 bg.DiscourseCommunity.init(function () {
                     bg.DiscourseCommunity.restart();
                 });
@@ -52,8 +59,12 @@ function saveOptions() {
  */
 function restoreOptions() {
 
-    chrome.storage.sync.get({ discourseUrl: '' }, function (items) {
+    chrome.storage.sync.get({
+        discourseUrl: '',
+        desktopNotificationsEnabled: true
+    }, function (items) {
         document.getElementById('discourse-url').value = items.discourseUrl;
+        document.getElementById('desktop-notifications-enabler').checked = items.desktopNotificationsEnabled;
     });
 }
 
