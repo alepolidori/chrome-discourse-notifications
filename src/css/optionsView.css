@@ -1,0 +1,47 @@
+body { font-size: 1em; }
+body > div { margin: 10px 0px; }
+body > :first-child {
+    text-align: right;
+    color: #919191;
+}
+i, a, input, label, button { vertical-align: middle; }
+a {
+    color: #08c;
+    text-decoration: none;
+}
+#version-lbl { font-size: 0.7em; }
+#add-source-input { width: 250px; }
+.hide { display: none; }
+.remove-source-btn {
+    margin-right: 5px;
+    color: #7a7a7a;
+    cursor: pointer;
+}
+.btn {
+    color: #fff;
+    background: #08c;
+    border: none;
+    outline: 0;
+    cursor: pointer;
+}
+.btn:hover {
+    color: #fff !important;
+    background: #006ca5 !important;
+    border: none;
+    outline: 0;
+}
+#add-source-btn {
+    display: inline-block;
+    vertical-align: middle;
+}
+.btn {
+    color: #fff;
+    background: #08c;
+    border-radius: 60px;
+    cursor: pointer;
+    display: table-cell;
+    width: 32px;
+    height: 30px;
+    text-align: center;
+    padding-top: 2px;
+}

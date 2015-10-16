@@ -1,13 +1,12 @@
 {
     "extName": {
-        "message": "Discourse Notifications",
+        "message": "Discourse Forum Notifications",
         "description": "Extension name."
     },
     "extDescription": {
-        "message": "Displays the notifications of the specified discourse community.",
+        "message": "Shows notifications of all added discourse forum sites.",
         "description": "Extension description."
     },
-    "save":              { "message": "Save" },
-    "options_saved":     { "message": "Options saved" },
-    "now_just_login_to": { "message": "Now just login to" }
+    "save": { "message": "Save" },
+    "options_saved": { "message": "Options saved" }
 }

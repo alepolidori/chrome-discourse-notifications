@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chrome Discourse Notifications Options</title>
+        <link rel="stylesheet" href="../src/css/fontawesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../src/css/optionsView.css">
+    </head>
+    <body>
+        <div>
+            <label id="version-lbl">Desktop notifications</label>
+        </div>
+        
+        <div>
+            <input type="checkbox" id="desktop-notifications-chk">
+            <label for="desktop-notifications-chk">Desktop notifications</label>
+        </div>
+        
+        <div class="hide">
+            <input type="checkbox" id="desktop-notifications-sound-chk">
+            <label for="desktop-notifications-sound-chk">Desktop notifications sound</label>
+        </div>
+        
+        <div>
+            <span id="add-source-btn">
+                <i class="fa fa-plus btn"></i>
+            </span>
+            <input type="text" id="add-source-input" placeholder="url">
+        </div>
+        
+        <div>
+            <div id="sources-list"></div>
+        </div>
+
+        <script src="../lib/jquery-2.1.4.min.js"></script>
+        <script src="../src/js/optionsView.js"></script>
+    </body>
+</html>

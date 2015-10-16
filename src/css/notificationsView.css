@@ -1,0 +1,84 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0px;
+  min-height: 300px;
+}
+
+html {
+  margin: 0;
+}
+
+section {
+  width: 420px;
+  min-height: 60px;
+  marign: 0.5em 0;
+  font-size: 12px;
+}
+
+#loader {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.spinner {
+    text-align: center;
+    margin-top: 20px;
+/*    color: #919191;*/
+    color: #00bad2;
+}
+
+.notification {
+  display: block;
+  padding: 0.5em 0.5em;
+  text-decoration: none;
+  outline: none;
+}
+
+.notification.unread {
+  background: #e0f5ff;
+  font-weight: bold;
+}
+
+.notification:hover {
+  background-color: rgb(240, 240, 240);
+}
+
+.notification-username {
+  margin-right: 0.5em;
+  color: #222;
+}
+.notification-title {
+  color: #08c;
+}
+.notification i {
+  margin-right: 5px;
+}
+.notification .fa {
+  color: #919191;
+}
+
+.source-header {
+    width: 100%;
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0 0.5em;
+    font-size: 1.3em;
+    color: #fff;
+    background: #00bad2;
+    padding: 0.3em 0.5em;
+    font-weight: bold;
+    text-decoration: none;
+    outline: none;
+}
+
+.source-header img {
+    margin-right: 5px;
+}
+
+.source-header > * {
+    vertical-align: middle;
+}

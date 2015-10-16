@@ -1,13 +1,12 @@
 {
     "extName": {
-        "message": "Discourse Notifications",
+        "message": "Discourse Forum Notifications",
         "description": "Nome dell'estensione."
     },
     "extDescription": {
-        "message": "Visualizza le notifiche del discourse configurato.",
+        "message": "Visualizza le notifiche di ogni forum discourse aggiunto.",
         "description": "Descrizione dell'estensione."
     },
-    "save":              { "message": "Salva" },
-    "options_saved":     { "message": "Opzioni salvate" },
-    "now_just_login_to": { "message": "Ora esegui il login in" }
+    "save": { "message": "Salva" },
+    "options_saved": { "message": "Opzioni salvate" }
 }
