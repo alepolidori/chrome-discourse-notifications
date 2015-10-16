@@ -92,11 +92,12 @@ var notificationsView = new function () {
 
     this.sourceHeaderTemplate = function (sourceId) {
         try {
+            var name = that.bg.sourceController.sources[sourceId].name;
             var faviconUrl = that.bg.sourceController.sources[sourceId].faviconUrl;
             return [
                 '<a href="', sourceId, '" class="source-header">',
                     '<img height="16" width="16" src="' + faviconUrl + '">',
-                    '<span>', sourceId, '</span>',
+                    '<span>', name, '</span>',
                 '</a>'
             ].join('');
         } catch (err) {

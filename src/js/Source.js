@@ -10,6 +10,7 @@ var Source = function (url) {
     this.sourceId = url;
     this.userId;
     this.mb;
+    this.name;
     this.faviconUrl = [ 'http://www.google.com/s2/favicons?domain=', this.url ].join('');
     this.counter = 0;
     this.$dispatcher = $({});
@@ -18,7 +19,7 @@ var Source = function (url) {
     this.notificationsErrorMap = {
         not_logged_in: 'login to view notifications'
     };
-    
+
     this.getUserData = function (cb) {
         try {
             var url = [ this.url, '/session/current.json' ].join('');
@@ -63,8 +64,8 @@ var Source = function (url) {
             cb(err);
         }
     };
-    
-    this.getFaviconUrl = function (cb) {
+
+    this.getHomePage = function (cb) {
         try {
             $.ajax({
                 url: this.url,
@@ -73,12 +74,12 @@ var Source = function (url) {
 
             }).done(function (data, textStatus, jqXHR) {
                 try {
-                    var pattern = '<link rel="icon" type="image/png" href="';
-                    var pos = data.indexOf(pattern);
-                    data = data.substring(pos + pattern.length, data.length);
-                    pos = data.indexOf('"');
-                    data = data.substring(0, pos);
-                    cb(null, data);
+                    if (typeof data === 'string') {
+                        cb(null, data);
+                    }
+                    else {
+                        cb(new Error('wrong home page data received'));
+                    }
                 } catch (err) {
                     console.error(err.stack);
                     cb(err);
@@ -91,6 +92,24 @@ var Source = function (url) {
                     cb(err);
                 }
             });
+        } catch (err) {
+            console.error(err.stack);
+            cb(err);
+        }
+    };
+
+    this.extractFaviconUrl = function (data) {
+        try {
+            return $('link[rel="icon"][type="image/png"]', $('<html></html>').html(data)).attr('href');
+        } catch (err) {
+            console.error(err.stack);
+            cb(err);
+        }
+    };
+
+    this.extractTitle = function (data) {
+        try {
+            return $('title', $('<html></html>').html(data)).text();
         } catch (err) {
             console.error(err.stack);
             cb(err);
@@ -160,7 +179,7 @@ var Source = function (url) {
             console.error(err.stack);
         }
     };
-    
+
     this.getNotifications = function (cb) {
         try {
             var options = {
@@ -176,7 +195,7 @@ var Source = function (url) {
                         if (typeof data === 'object' &&
                             data.notifications &&
                             data.notifications instanceof Array === true) {
-                            
+
                             cb(null, data.notifications);
                         }
                         else if (typeof data === 'object' &&
@@ -204,12 +223,13 @@ var Source = function (url) {
 
     (function init () {
         try {
-            that.getFaviconUrl(function (err, url) {
+            that.getHomePage(function (err, data) {
                 if (err) {
                     console.error(err);
                 }
                 else {
-                    that.faviconUrl = url;
+                    that.faviconUrl = that.extractFaviconUrl(data);
+                    that.name = that.extractTitle(data);
                 }
             });
             that.getUserData(function (err) {
