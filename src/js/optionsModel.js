@@ -64,8 +64,13 @@ var optionsModel = new function () {
     this.normalizeBaseUrl = function (url) {
         try {
             var arr = url.split('/');
-            arr = [arr[0], arr[2]];
-            return arr.join('//');
+            var urlParts = [arr[0], arr[2]];
+            var returnUrl = urlParts.join('//');
+            if (arr[3]) {
+                var subParts = arr.slice(3);
+                returnUrl += '/' + subParts.join('/');
+            }
+            return returnUrl;
         } catch (err) {
             console.error(err.stack);
             return url;
