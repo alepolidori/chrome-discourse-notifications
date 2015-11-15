@@ -27,7 +27,6 @@ section {
 .spinner {
     text-align: center;
     margin-top: 20px;
-/*    color: #919191;*/
     color: #00bad2;
 }
 
@@ -81,4 +80,35 @@ section {
 
 .source-header > * {
     vertical-align: middle;
+}
+
+.btn {
+    display: inline-block;
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 1em;
+    line-height: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .25s;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    border: none;
+    color: #222;
+    font-weight: normal;
+    background: #e9e9e9;
+}
+.btn:hover {
+    background: #b2b2b2;
+    color: #fff;
+}
+.source-actions {
+    text-align: right;
+}
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #e9e9e9;
+    padding: 0;
+    margin: 0px;
 }

@@ -9,6 +9,8 @@ var optionsView = new function () {
     this.$enableDesktopNotificationsSoundChk;
     this.$addSourceBtn;
     this.$addSourceInput;
+    this.$sourceSpinner;
+    this.$sourceOutput;
     this.$sourcesList;
     this.$version;
 
@@ -21,6 +23,8 @@ var optionsView = new function () {
             that.$addSourceBtn = $('#add-source-btn');
             that.$addSourceInput = $('#add-source-input');
             that.$sourcesList = $('#sources-list');
+            that.$sourceOutput = $('#source-output-lbl');
+            that.$sourceSpinner = $('#source-spinner');
 
             that.$addSourceInput.on('keyup', that.onEvtSourceInputKeyup);
             that.$enableDesktopNotificationsChk.on('click', that.onEvtEnableDesktopNotificationsClicked);
@@ -35,7 +39,7 @@ var optionsView = new function () {
             console.error(err.stack);
         }
     });
-    
+
     this.onEvtSourceInputKeyup = function (ev) {
         try {
             if (ev.keyCode === 13) { that.onEvtAddSource(); }
@@ -62,18 +66,74 @@ var optionsView = new function () {
         }
     };
 
-    this.onEvtAddSource = function () {
+    this.blockWaitingSourceInput = function () {
         try {
-            var url = that.$addSourceInput.val();
-            if (url !== '') {
-                that.bg.optionsModel.addSource(url, that.updateSourcesList);
-                optionsView.$addSourceInput.val('');
-            }
+            that.$addSourceInput.prop('disabled', true);
+            $('#add-source-btn').toggle();
+            $('#source-spinner').toggle();
         } catch (err) {
             console.error(err.stack);
         }
     };
-    
+
+    this.unblockWaitingSourceInput = function () {
+        try {
+            that.$addSourceInput.prop('disabled', false);
+            $('#add-source-btn').toggle();
+            $('#source-spinner').toggle();
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.onEvtAddSource = function () {
+        try {
+            var checkProtocols = false;
+            var url = that.$addSourceInput.val();
+
+            that.$sourceOutput.text('');
+            that.blockWaitingSourceInput();
+
+            if (!url.startsWith('http')) {
+                checkProtocols = true;
+                url = 'https://' + url;
+            }
+            if (!that.bg.sourceController.isUrlValid(url)) {
+                that.$sourceOutput.text('invalid url');
+                that.unblockWaitingSourceInput();
+                return;
+            }
+
+            that.bg.sourceController.checkUrl(url, function (err, res) {
+                if (err && !checkProtocols) {
+                    that.$sourceOutput.text('url is unreachable');
+                    that.unblockWaitingSourceInput();
+                }
+                else if (err && checkProtocols) {
+                    url = url.replace('https://', 'http://');
+                    that.bg.sourceController.checkUrl(url, function (err, res) {
+                        if (err) {
+                            that.$sourceOutput.text('url is unreachable');
+                        }
+                        else {
+                            that.bg.optionsModel.addSource(url, that.updateSourcesList);
+                            optionsView.$addSourceInput.val('');
+                        }
+                        that.unblockWaitingSourceInput();
+                    });
+                }
+                else if (!err) {
+                    that.bg.optionsModel.addSource(url, that.updateSourcesList);
+                    optionsView.$addSourceInput.val('');
+                    that.unblockWaitingSourceInput();
+                }
+            });
+        } catch (err) {
+            console.error(err.stack);
+            that.unblockWaitingSourceInput();
+        }
+    };
+
     this.onEvtRemoveSource = function () {
         try {
             var url = $(this).data('url');
@@ -87,8 +147,8 @@ var optionsView = new function () {
         try {
             return [
                 '<div>',
-                    '<i class="fa fa-times-circle remove-source-btn" data-url="', url, '"></i>',
-                    '<a href="', url, '">', url, '</a>',
+                '<i class="fa fa-times-circle remove-source-btn" data-url="', url, '"></i>',
+                '<a href="', url, '">', url, '</a>',
                 '</div>'
             ].join('');
         } catch (err) {

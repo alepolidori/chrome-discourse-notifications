@@ -17,24 +17,13 @@ a {
     color: #7a7a7a;
     cursor: pointer;
 }
-.btn {
-    color: #fff;
-    background: #08c;
-    border: none;
-    outline: 0;
-    cursor: pointer;
-}
-.btn:hover {
-    color: #fff !important;
-    background: #006ca5 !important;
-    border: none;
-    outline: 0;
-}
 #add-source-btn {
     display: inline-block;
     vertical-align: middle;
 }
 .btn {
+    border: none;
+    outline: 0;
     color: #fff;
     background: #08c;
     border-radius: 60px;
@@ -45,3 +34,17 @@ a {
     text-align: center;
     padding-top: 2px;
 }
+.btn:hover {
+    color: #fff !important;
+    background: #006ca5 !important;
+    border: none;
+    outline: 0;
+}
+#source-output-lbl {
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 0.8em;
+    color: red;
+    height: 1.5em;
+}
+.spinner { color: #08c; }
