@@ -67,7 +67,8 @@ var optionsModel = new function () {
             var urlParts = [arr[0], arr[2]];
             var returnUrl = urlParts.join('//');
             if (arr[3]) {
-                returnUrl += '/' + arr[3];
+                var subParts = arr.slice(3);
+                returnUrl += '/' + subParts.join('/');
             }
             return returnUrl;
         } catch (err) {
