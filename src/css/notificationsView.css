@@ -65,10 +65,10 @@ section {
     display: table;
     border-collapse: separate;
     border-spacing: 0 0.5em;
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #fff;
     background: #00bad2;
-    padding: 0.3em 0.5em;
+    padding-left: 16px;
     font-weight: bold;
     text-decoration: none;
     outline: none;
