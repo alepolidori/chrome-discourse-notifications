@@ -100,7 +100,13 @@ var Source = function (url) {
 
     this.extractFaviconUrl = function (data) {
         try {
-            return $('link[rel="icon"][type="image/png"]', $('<html></html>').html(data)).attr('href');
+            var value = $('link[rel="icon"][type="image/png"]', $('<html></html>').html(data)).attr('href');
+            if (value.indexOf('http://') !== 0 && value.indexOf('https://') !== 0) {
+                value = this.url +
+                        (value.substring(0, 1) !== '/' ? '/' : '') +
+                        value;
+            }
+            return value;
         } catch (err) {
             console.error(err.stack);
             cb(err);
