@@ -1,11 +1,12 @@
 var optionsModel = new function () {
     'use strict';
-    
+
     var that = this;
-    
+
     this.ID = 'optionsModel';
     this.defaults = {
         sources: {},
+        fontSize: '1',
         desktopNotificationsEnabled: true,
         desktopNotificationsSoundEnabled: true
     };
@@ -13,7 +14,7 @@ var optionsModel = new function () {
     this.$dispatcher = $({});
     this.EVT_SOURCE_ADDED = 'EVT_SOURCE_ADDED';
     this.EVT_SOURCE_REMOVED = 'EVT_SOURCE_REMOVED';
-    
+
     this.loadOptions = function (cb) {
         try {
             chrome.storage.sync.get(this.defaults, function (items) {
@@ -25,7 +26,7 @@ var optionsModel = new function () {
                         }
                     }
                     cb();
-                    
+
                 } catch (err) {
                     console.error(err.stack);
                     cb(err);
@@ -36,7 +37,19 @@ var optionsModel = new function () {
             cb(err);
         }
     };
-    
+
+    this.setFontSize = function (value) {
+        try {
+            chrome.storage.sync.set({
+                fontSize: value
+            }, function (items) {
+                that.options.fontSize = value;
+            });
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
     this.setEnableDesktopNotifications = function (value) {
         try {
             chrome.storage.sync.set({
@@ -48,7 +61,7 @@ var optionsModel = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.setEnableDesktopNotificationsSound = function (value) {
         try {
             chrome.storage.sync.set({
@@ -60,7 +73,7 @@ var optionsModel = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.normalizeBaseUrl = function (url) {
         try {
             var arr = url.split('/');
@@ -76,14 +89,14 @@ var optionsModel = new function () {
             return url;
         }
     };
-    
+
     this.addSource = function (url, cb) {
         try {
             url = this.normalizeBaseUrl(url);
             chrome.storage.sync.get(this.defaults, function (items) {
                 try {
                     items.sources[url] = '';
-                    
+
                     chrome.storage.sync.set({
                         sources: items.sources
                     }, function () {
@@ -101,13 +114,13 @@ var optionsModel = new function () {
             cb(err);
         }
     };
-    
+
     this.removeSource = function (url, cb) {
         try {
             chrome.storage.sync.get(this.defaults, function (items) {
                 try {
                     delete items.sources[url];
-                    
+
                     chrome.storage.sync.set({
                         sources: items.sources
                     }, function () {
@@ -125,7 +138,7 @@ var optionsModel = new function () {
             cb(err);
         }
     };
-    
+
     this.sourcesNum = function () {
         try {
             return this.options.sources ? Object.keys(this.options.sources).length : 0;
@@ -133,7 +146,7 @@ var optionsModel = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.isDesktopNotificationsEnabled = function () {
         try {
             return this.options.desktopNotificationsEnabled;

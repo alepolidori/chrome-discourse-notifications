@@ -17,6 +17,7 @@ var notificationsView = new function () {
     $(function () {
         try {
             that.$notificationsPage = $('#notifications-page');
+            that.$notificationsPage.css('font-size', notificationsView.bg.optionsModel.options.fontSize + 'em');
             that.bg.sourceController.getAllSourcesNotifications(function (err, data) {
                 if (err) {
                     that.$notificationsPage.html(err);
@@ -44,7 +45,7 @@ var notificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.appendSourceId = function (id, n) {
         try {
             n.sourceId = id;
@@ -137,7 +138,7 @@ var notificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.sourceErrorTemplate = function (str, url) {
         try {
             var classes = 'notification js-notification-link';

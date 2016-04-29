@@ -13,9 +13,14 @@ var optionsView = new function () {
     this.$sourceOutput;
     this.$sourcesList;
     this.$version;
+    this.$fontSizeRange;
+    this.$fontSizeLbl;
+    this.$body;
 
     $(function () {
         try {
+            var value;
+            that.$body = $('body');
             that.$version = $('#version-lbl');
             that.$version.text('Version ' + chrome.runtime.getManifest().version);
             that.$enableDesktopNotificationsChk = $('#desktop-notifications-chk');
@@ -25,20 +30,59 @@ var optionsView = new function () {
             that.$sourcesList = $('#sources-list');
             that.$sourceOutput = $('#source-output-lbl');
             that.$sourceSpinner = $('#source-spinner');
+            that.$fontSizeLbl = $('#font-size-lbl');
+            that.$fontSizeRange = $('#font-size-range');
+            value = that.bg.optionsModel.options.fontSize || that.bg.optionsModel.defaults.fontSize;
+            that.$fontSizeLbl.text(value);
+            that.$fontSizeRange.val(value);
+            that.setFontSize(value);
 
             that.$addSourceInput.on('keyup', that.onEvtSourceInputKeyup);
             that.$enableDesktopNotificationsChk.on('click', that.onEvtEnableDesktopNotificationsClicked);
             that.$enableDesktopNotificationsSoundChk.on('click', that.onEvtEnableDesktopNotificationsSoundClicked);
             that.$addSourceBtn.on('click', that.onEvtAddSource);
-            $('#sources-list').on('click', '.remove-source-btn', that.onEvtRemoveSource);
-
-            that.$enableDesktopNotificationsChk.prop('checked', that.bg.optionsModel.options.desktopNotificationsEnabled);
-            that.$enableDesktopNotificationsSoundChk.prop('checked', that.bg.optionsModel.options.desktopNotificationsSoundEnabled);
+            that.$sourcesList.on('click', '.remove-source-btn', that.onEvtRemoveSource);
+            that.$fontSizeRange.on('input', that.onEvtFontSizeRangeInput);
+            that.$fontSizeRange.on('change', that.onEvtFontSizeRangeChanged);
+            value = that.bg.optionsModel.options.desktopNotificationsEnabled === undefined ?
+                that.bg.optionsModel.defaults.desktopNotificationsEnabled :
+                that.bg.optionsModel.options.desktopNotificationsEnabled;
+            that.$enableDesktopNotificationsChk.prop('checked', value);
+            value = that.bg.optionsModel.options.desktopNotificationsSoundEnabled === undefined ?
+                that.bg.optionsModel.defaults.desktopNotificationsSoundEnabled :
+                that.bg.optionsModel.options.desktopNotificationsSoundEnabled;
+            that.$enableDesktopNotificationsSoundChk.prop('checked', value);
             that.updateSourcesList();
         } catch (err) {
             console.error(err.stack);
         }
     });
+
+    this.setFontSize = function (value) {
+        try {
+            that.$body.css('font-size', value + 'em');
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.onEvtFontSizeRangeChanged = function (ev) {
+        try {
+            that.setFontSize($(this).val());
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.onEvtFontSizeRangeInput = function (ev) {
+        try {
+            var value = $(this).val();
+            that.$fontSizeLbl.text(value);
+            that.bg.optionsModel.setFontSize(value);
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
 
     this.onEvtSourceInputKeyup = function (ev) {
         try {
