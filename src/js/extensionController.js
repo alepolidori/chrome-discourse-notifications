@@ -77,11 +77,11 @@ var extensionController = new function () {
 
     this.showOptionsView = function () {
         try {
-            mediator.showTab(that.optionsUrl);
+            mediator.showTab(that.optionsUrl, true);
         } catch (err) {
             console.error(err.stack);
         }
-    }
+    };
 
     this.logger = function (str, obj) {
         try {

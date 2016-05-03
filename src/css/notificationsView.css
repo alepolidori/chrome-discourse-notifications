@@ -112,3 +112,19 @@ hr {
     padding: 0;
     margin: 0px;
 }
+
+.toolbar {
+    line-height: 25px;
+    float: right;
+    font-size: 1.5em;
+    color: #919191;
+}
+.toolbar a {
+    text-decoration: none;
+    color: #919191;
+}
+.toolbar-text {
+    color: #919191;
+    margin-left: 5px;
+    margin-right: 10px;
+}
