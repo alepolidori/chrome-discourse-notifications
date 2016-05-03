@@ -3,14 +3,16 @@ var Source = function (url) {
 
     var that = this;
 
-    this.ID = 'Source'
+    this.ID = 'Source';
     this.USER_DATA_FAIL_TIMEOUT_POLLING = 15000;
     this.url = url;
     this.notificationsUrl = [ this.url, '/notifications?', 'recent=true' ].join('');
     this.sourceId = url;
     this.userId;
+    this.username;
     this.mb;
     this.name;
+    this.messagesUrl;
     this.faviconUrl = [ 'http://www.google.com/s2/favicons?domain=', this.url ].join('');
     this.counter = 0;
     this.$dispatcher = $({});
@@ -35,10 +37,18 @@ var Source = function (url) {
                     if (typeof data === 'object' &&
                         typeof data.current_user === 'object' &&
                         typeof data.current_user.id === 'number' &&
+                        typeof data.current_user.username === 'string' &&
                         typeof data.current_user.unread_notifications === 'number' &&
                         typeof data.current_user.unread_private_messages === 'number') {
 
                         that.userId = data.current_user.id;
+                        that.username = data.current_user.username;
+                        that.messagesUrl = [
+                            that.url,
+                            '/users/',
+                            that.username,
+                            '/messages'
+                        ].join('');
 
                         that.counter = data.current_user.unread_notifications + data.current_user.unread_private_messages;
                         that.$dispatcher.trigger(that.EVT_NOTIFICATION_COUNTER_UPDATE);
