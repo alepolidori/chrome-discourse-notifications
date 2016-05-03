@@ -121,6 +121,23 @@ var notificationsView = new function () {
         }
     };
 
+    this.toolbarTemplate = function () {
+        try {
+            var optUrl = mediator.getOptionsUrl();
+            var classes = 'toolbar';
+            return [
+                '<div class="', classes, '">',
+                    '<a href="', optUrl, '">',
+                        '<i class="fa fa-gear"></i>',
+                        '<span class="toolbar-text">Options</span>',
+                    '</a>',
+                '</div>'
+            ].join('');
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
     this.initLinks = function () {
         try {
             var links = $('a[href]');
@@ -158,6 +175,7 @@ var notificationsView = new function () {
         try {
             var ns, sourceId;
             var html = '';
+            html += that.toolbarTemplate();
             for (sourceId in data) {
                 html += that.sourceHeaderTemplate(sourceId);
                 if (data[sourceId].notifications) {
