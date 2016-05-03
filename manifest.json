@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extName__",
     "description": "__MSG_extDescription__",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "author": "Alessandro Polidori",
     "manifest_version": 2,
     "default_locale": "en",
@@ -15,7 +15,8 @@
             "lib/async.js",
             "lib/jquery-2.1.4.min.js",
             "lib/message-bus-fix.js",
-            "src/js/desktopNotificationsView.js",
+            "src/js/mediator.js",
+            "src/js/chrDesktopNotificationsView.js",
             "src/js/Source.js",
             "src/js/optionsModel.js",
             "src/js/extensionController.js",

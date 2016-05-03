@@ -1,11 +1,11 @@
-var desktopNotificationsView = new function () {
+var chrDesktopNotificationsView = new function () {
     'use strict';
-    
+
     var that = this;
 
-    this.ID = 'desktopNotificationsView';
+    this.ID = 'chrDesktopNotificationsView';
     this.ns = {};
-    
+
     this.showChrRichNotificationProgress = function (title, body, sourceUrl, noturl, iconUrl) {
         try {
             var opt = {
@@ -29,7 +29,7 @@ var desktopNotificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.startUpdateChrNotificationProgress = function (nid) {
         try {
             var value = 0;
@@ -49,7 +49,7 @@ var desktopNotificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.stopUpdateChrNotificationProgress = function (nid) {
         try {
             if (this.ns[nid] && this.ns[nid].updateIdInterval) {
@@ -59,7 +59,7 @@ var desktopNotificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.onClosedNotification = function (nid) {
         try {
             that.stopUpdateChrNotificationProgress(nid);
@@ -68,12 +68,12 @@ var desktopNotificationsView = new function () {
             console.error(err.stack);
         }
     };
-    
+
     this.onClickedNotification = function (nid) {
         try {
             if (that.ns[nid]) {
                 var url = that.ns[nid].clickUrl;
-                chrome.tabs.create({ url: url, active: true });
+                mediator.showTab(url, true);
                 chrome.notifications.clear(nid, function (wasCleared) {});
             }
             else {

@@ -81,12 +81,12 @@ var sourceController = new function () {
         try {
             if (optionsModel.isDesktopNotificationsEnabled() === true) {
                 var sourceUrl = that.sources[data.sourceId].url;
-                that.isDiscourseSiteOpened(sourceUrl, function (err, opened) {
+                mediator.isDiscourseSiteOpened(sourceUrl, function (err, opened) {
                     if (!err && opened === false) {
                         var title = that.extractNotificationTitle(data.data);
                         var noturl = [ sourceUrl, data.data.post_url].join('');
                         var iconUrl = that.sources[data.sourceId].faviconUrl;
-                        desktopNotificationsView.showChrRichNotificationProgress(title, data.data.excerpt, sourceUrl, noturl, iconUrl);
+                        mediator.showNotification(title, data.data.excerpt, sourceUrl, noturl, iconUrl);
                     }
                 });
             }
@@ -174,24 +174,6 @@ var sourceController = new function () {
         } catch (err) {
             console.error(err.stack);
             cb(err.stack);
-        }
-    };
-
-    this.isDiscourseSiteOpened = function (url, cb) {
-        try {
-            chrome.tabs.query({}, function (tabs) {
-                var i;
-                for (i = 0; i < tabs.length; i++) {
-                    if (tabs[i].url.indexOf(url) > -1) {
-                        cb(null, true);
-                        return;
-                    }
-                }
-                cb(null, false);
-            });
-        } catch (err) {
-            console.error(err.stack);
-            cb(err);
         }
     };
 

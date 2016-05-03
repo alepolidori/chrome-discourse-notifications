@@ -4,7 +4,7 @@ var optionsView = new function () {
     var that = this;
 
     this.ID = 'optionsView';
-    this.bg = chrome.extension.getBackgroundPage();
+    this.bg = mediator.getBackgroundPage();
     this.$enableDesktopNotificationsChk;
     this.$enableDesktopNotificationsSoundChk;
     this.$addSourceBtn;
@@ -22,7 +22,7 @@ var optionsView = new function () {
             var value;
             that.$body = $('body');
             that.$version = $('#version-lbl');
-            that.$version.text('Version ' + chrome.runtime.getManifest().version);
+            that.$version.text('Version ' + mediator.getAppVersion());
             that.$enableDesktopNotificationsChk = $('#desktop-notifications-chk');
             that.$enableDesktopNotificationsSoundChk = $('#desktop-notifications-sound-chk');
             that.$addSourceBtn = $('#add-source-btn');

@@ -17,7 +17,7 @@ var optionsModel = new function () {
 
     this.loadOptions = function (cb) {
         try {
-            chrome.storage.sync.get(this.defaults, function (items) {
+            mediator.getStorageWithDefaults(this.defaults, function (items) {
                 try {
                     var k;
                     for (k in that.defaults) {
@@ -40,7 +40,7 @@ var optionsModel = new function () {
 
     this.setFontSize = function (value) {
         try {
-            chrome.storage.sync.set({
+            mediator.setStorageItems({
                 fontSize: value
             }, function (items) {
                 that.options.fontSize = value;
@@ -52,7 +52,7 @@ var optionsModel = new function () {
 
     this.setEnableDesktopNotifications = function (value) {
         try {
-            chrome.storage.sync.set({
+            mediator.setStorageItems({
                 desktopNotificationsEnabled: value
             }, function (items) {
                 that.options.desktopNotificationsEnabled = value;
@@ -64,7 +64,7 @@ var optionsModel = new function () {
 
     this.setEnableDesktopNotificationsSound = function (value) {
         try {
-            chrome.storage.sync.set({
+            mediator.setStorageItems({
                 desktopNotificationsSoundEnabled: value
             }, function (items) {
                 that.options.desktopNotificationsSoundEnabled = value;
@@ -93,11 +93,11 @@ var optionsModel = new function () {
     this.addSource = function (url, cb) {
         try {
             url = this.normalizeBaseUrl(url);
-            chrome.storage.sync.get(this.defaults, function (items) {
+            mediator.getStorageWithDefaults(this.defaults, function (items) {
                 try {
                     items.sources[url] = '';
 
-                    chrome.storage.sync.set({
+                    mediator.setStorageItems({
                         sources: items.sources
                     }, function () {
                         that.options.sources = items.sources;
@@ -117,11 +117,11 @@ var optionsModel = new function () {
 
     this.removeSource = function (url, cb) {
         try {
-            chrome.storage.sync.get(this.defaults, function (items) {
+            mediator.getStorageWithDefaults(this.defaults, function (items) {
                 try {
                     delete items.sources[url];
 
-                    chrome.storage.sync.set({
+                    mediator.setStorageItems({
                         sources: items.sources
                     }, function () {
                         delete that.options.sources[url];

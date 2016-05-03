@@ -6,14 +6,8 @@ var extensionController = new function () {
     this.ID = 'extensionController';
     this.debug = true;
     this.popupUrl = 'html/popup.html';
-    this.optionsUrl = chrome.extension.getURL('html/options.html');
+    this.optionsUrl = mediator.getOptionsUrl();
     this.options = {};
-
-    (function () {
-        chrome.runtime.onInstalled.addListener(function (details) {
-            that.onInstalled(details);
-        });
-    }());
 
     this.onInstalled = function (details) {
         try {
@@ -54,10 +48,10 @@ var extensionController = new function () {
         try {
             that.removeExtensionBtnListeners();
             if (optionsModel.sourcesNum() > 0) {
-                chrome.browserAction.setPopup({ popup: that.popupUrl });
+                mediator.setExtensionIconPopup({ popup: that.popupUrl });
             }
             else {
-                chrome.browserAction.onClicked.addListener(that.showOptionsView);
+                mediator.extensionIconOnClicked(that.showOptionsView);
             }
         } catch (err) {
             console.error(err.stack);
@@ -66,8 +60,8 @@ var extensionController = new function () {
 
     this.removeExtensionBtnListeners = function () {
         try {
-            chrome.browserAction.setPopup({ popup: '' });
-            chrome.browserAction.onClicked.removeListener(this.showOptionsView);
+            mediator.setExtensionIconPopup({ popup: '' });
+            mediator.extensionIconOnClicked(this.showOptionsView);
         } catch (err) {
             console.error(err.stack);
         }
@@ -75,7 +69,7 @@ var extensionController = new function () {
 
     this.setCounterBadge = function (val) {
         try {
-            chrome.browserAction.setBadgeText({ text: val.toString() });
+            mediator.setExtensionBtnText({ text: val.toString() });
         } catch (err) {
             console.error(err.stack);
         }
@@ -83,15 +77,7 @@ var extensionController = new function () {
 
     this.showOptionsView = function () {
         try {
-            chrome.tabs.query({ url: that.optionsUrl }, function (tabs) {
-                if (tabs.length > 0) {
-                    chrome.tabs.update(tabs[0].id, { active: true });
-                    chrome.tabs.reload(tabs[0].id);
-                }
-                else {
-                    chrome.tabs.create({ url: that.optionsUrl });
-                }
-            });
+            mediator.showTab(that.optionsUrl);
         } catch (err) {
             console.error(err.stack);
         }
@@ -119,10 +105,10 @@ var extensionController = new function () {
 
     this.migrateOptionsFromVer03 = function () {
         try {
-            chrome.storage.sync.get(function (items) {
+            mediator.getStorage(function (items) {
                 if (items && items.discourseUrl) {
                     optionsModel.addSource(items.discourseUrl, function (err) {
-                        chrome.storage.sync.remove('discourseUrl', function () {});
+                        mediator.storageRemoveItem('discourseUrl', function () {});
                     });
                 }
             });
@@ -130,6 +116,10 @@ var extensionController = new function () {
             console.error(err.stack);
         }
     };
+
+    (function () {
+        mediator.doOnInstalled(that.onInstalled);
+    }());
 };
 
 extensionController.init();

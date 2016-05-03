@@ -4,7 +4,7 @@ var notificationsView = new function () {
     var that = this;
 
     this.ID = 'notificationsView';
-    this.bg = chrome.extension.getBackgroundPage();
+    this.bg = mediator.getBackgroundPage();
     this.$notificationsPage;
     this.numNotifications = 10;
     this.iconClassMap = {
@@ -127,7 +127,7 @@ var notificationsView = new function () {
             [].forEach.call(links, function (link) {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    chrome.tabs.create({ url: e.currentTarget.href, active: false });
+                    mediator.showTab(e.currentTarget.href, false);
                     var sourceId = $(this).data('source-id');
                     if (sourceId) {
                         that.bg.sourceController.sources[sourceId].updateNotifications();
