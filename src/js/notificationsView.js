@@ -146,10 +146,6 @@ var notificationsView = new function () {
                     e.preventDefault();
                     var urlToSearch = that.bg.sourceController.removePostMessageNumber(e.currentTarget.href);
                     mediator.showTab(e.currentTarget.href, !notificationsView.bg.optionsModel.isOpenPagesBackgroundEnabled(), true, urlToSearch);
-                    var sourceId = $(this).data('source-id');
-                    if (sourceId) {
-                        that.bg.sourceController.sources[sourceId].updateNotifications();
-                    }
                 }, false);
             });
 
