@@ -202,5 +202,22 @@ var sourceController = new function () {
         } catch (err) {
             console.error(err.stack);
         }
-    }
+    };
+
+    /**
+     * Returns the url without the number of the post message to be read.
+     *
+     * @method removePostMessageNumber
+     * @param  {string} url The url to be manipulated
+     * @return {string} The url without the number of the post message to be read.
+     */
+    this.removePostMessageNumber = function (url) {
+        try {
+            var value = url.split('/');
+            value.pop();
+            return value.join('/');
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
 };

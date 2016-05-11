@@ -77,7 +77,7 @@ var extensionController = new function () {
 
     this.showOptionsView = function () {
         try {
-            mediator.showTab(that.optionsUrl, true);
+            mediator.showTab(that.optionsUrl, true, true);
         } catch (err) {
             console.error(err.stack);
         }

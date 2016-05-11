@@ -5,23 +5,38 @@ var mediator = new function () {
 
     this.ID = 'mediator';
 
-    this.showTab = function (url, active, update) {
+    /**
+     * If "update" is false it opens a new tab to url specified by "urlToOpen". Otherwise it looks for an
+     * already opened tab with url "urlToSearch". In this case the following scenarios could be present:
+     * - a tab does not exist: it creates a new one and gives it the focus if "active" is true
+     * - a tab exists: it updates the tab with url "urlToOpen" gives it the focus if "active" is true
+     *
+     * The considered tabs are those of the current window.
+     *
+     * @method showTab
+     * @param {string}  urlToOpen     Url to be opened or updated
+     * @param {boolean} active        Whether the tab should be activated
+     * @param {boolean} [update]      If true it checks for an already opened tab and if so, it updates the tab
+     * @param {string}  [urlToSearch] The url used to search an already opened tab. If it is not specified,
+     *                                "urlToOpen" will be used. It requires "update" set to true.
+     */
+    this.showTab = function (urlToOpen, active, update, urlToSearch) {
         try {
             active = active ? active : false;
             update = update ? update : false;
+            urlToSearch = urlToSearch ? (urlToSearch + '/*') : urlToOpen;
             if (update) {
-                chrome.tabs.query({ url: url }, function (tabs) {
+                chrome.tabs.query({ url: urlToSearch, currentWindow: true }, function (tabs) {
                     if (tabs.length > 0) {
-                        chrome.tabs.update(tabs[0].id, { active: active });
-                        chrome.tabs.reload(tabs[0].id);
+                        chrome.tabs.update(tabs[0].id, { active: active, url: urlToOpen });
                     }
                     else {
-                        chrome.tabs.create({ url: url, active: active });
+                        chrome.tabs.create({ url: urlToOpen, active: active });
                     }
                 });
             }
             else {
-                chrome.tabs.create({ url: url, active: active });
+                chrome.tabs.create({ url: urlToOpen, active: active });
             }
         } catch (err) {
             console.error(err.stack);

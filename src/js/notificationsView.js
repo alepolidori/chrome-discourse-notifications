@@ -144,7 +144,8 @@ var notificationsView = new function () {
             [].forEach.call(links, function (link) {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    mediator.showTab(e.currentTarget.href, false);
+                    var urlToSearch = that.bg.sourceController.removePostMessageNumber(e.currentTarget.href);
+                    mediator.showTab(e.currentTarget.href, false, true, urlToSearch);
                     var sourceId = $(this).data('source-id');
                     if (sourceId) {
                         that.bg.sourceController.sources[sourceId].updateNotifications();

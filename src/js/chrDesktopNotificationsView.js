@@ -73,7 +73,8 @@ var chrDesktopNotificationsView = new function () {
         try {
             if (that.ns[nid]) {
                 var url = that.ns[nid].clickUrl;
-                mediator.showTab(url, true);
+                var urlToSearch = sourceController.removePostMessageNumber(url);
+                mediator.showTab(url, true, true, urlToSearch);
                 chrome.notifications.clear(nid, function (wasCleared) {});
             }
             else {
