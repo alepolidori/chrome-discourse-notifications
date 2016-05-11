@@ -7,6 +7,7 @@ var optionsView = new function () {
     this.bg = mediator.getBackgroundPage();
     this.$enableDesktopNotificationsChk;
     this.$enableDesktopNotificationsSoundChk;
+    this.$openPagesBackgroundChk;
     this.$addSourceBtn;
     this.$addSourceInput;
     this.$sourceSpinner;
@@ -23,6 +24,7 @@ var optionsView = new function () {
             that.$body = $('body');
             that.$version = $('#version-lbl');
             that.$version.text('Version ' + mediator.getAppVersion());
+            that.$openPagesBackgroundChk = $('#open-pages-background-chk');
             that.$enableDesktopNotificationsChk = $('#desktop-notifications-chk');
             that.$enableDesktopNotificationsSoundChk = $('#desktop-notifications-sound-chk');
             that.$addSourceBtn = $('#add-source-btn');
@@ -38,6 +40,7 @@ var optionsView = new function () {
             that.setFontSize(value);
 
             that.$addSourceInput.on('keyup', that.onEvtSourceInputKeyup);
+            that.$openPagesBackgroundChk.on('click', that.onEvtOpenPagesBackgroundClicked);
             that.$enableDesktopNotificationsChk.on('click', that.onEvtEnableDesktopNotificationsClicked);
             that.$enableDesktopNotificationsSoundChk.on('click', that.onEvtEnableDesktopNotificationsSoundClicked);
             that.$addSourceBtn.on('click', that.onEvtAddSource);
@@ -52,6 +55,10 @@ var optionsView = new function () {
                 that.bg.optionsModel.defaults.desktopNotificationsSoundEnabled :
                 that.bg.optionsModel.options.desktopNotificationsSoundEnabled;
             that.$enableDesktopNotificationsSoundChk.prop('checked', value);
+            value = that.bg.optionsModel.options.openPagesBackgroundEnabled === undefined ?
+                that.bg.optionsModel.defaults.openPagesBackgroundEnabled :
+                that.bg.optionsModel.options.openPagesBackgroundEnabled;
+            that.$openPagesBackgroundChk.prop('checked', value);
             that.updateSourcesList();
         } catch (err) {
             console.error(err.stack);
@@ -87,6 +94,15 @@ var optionsView = new function () {
     this.onEvtSourceInputKeyup = function (ev) {
         try {
             if (ev.keyCode === 13) { that.onEvtAddSource(); }
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.onEvtOpenPagesBackgroundClicked = function () {
+        try {
+            var value = $(this).prop('checked');
+            that.bg.optionsModel.setEnableOpenPagesBackground(value);
         } catch (err) {
             console.error(err.stack);
         }

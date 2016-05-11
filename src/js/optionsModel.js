@@ -7,6 +7,7 @@ var optionsModel = new function () {
     this.defaults = {
         sources: {},
         fontSize: '1',
+        openPagesBackgroundEnabled: true,
         desktopNotificationsEnabled: true,
         desktopNotificationsSoundEnabled: true
     };
@@ -44,6 +45,18 @@ var optionsModel = new function () {
                 fontSize: value
             }, function (items) {
                 that.options.fontSize = value;
+            });
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.setEnableOpenPagesBackground = function (value) {
+        try {
+            mediator.setStorageItems({
+                openPagesBackgroundEnabled: value
+            }, function (items) {
+                that.options.openPagesBackgroundEnabled = value;
             });
         } catch (err) {
             console.error(err.stack);
@@ -150,6 +163,14 @@ var optionsModel = new function () {
     this.isDesktopNotificationsEnabled = function () {
         try {
             return this.options.desktopNotificationsEnabled;
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
+    this.isOpenPagesBackgroundEnabled = function () {
+        try {
+            return this.options.openPagesBackgroundEnabled;
         } catch (err) {
             console.error(err.stack);
         }
