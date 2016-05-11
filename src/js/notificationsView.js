@@ -127,10 +127,10 @@ var notificationsView = new function () {
             var classes = 'toolbar';
             return [
                 '<div class="', classes, '">',
-                    '<a href="', optUrl, '">',
+                    '<span class="showOptionsView cursorPointer">',
                         '<i class="fa fa-gear"></i>',
                         '<span class="toolbar-text">Options</span>',
-                    '</a>',
+                    '</span>',
                 '</div>'
             ].join('');
         } catch (err) {
@@ -150,6 +150,10 @@ var notificationsView = new function () {
                         that.bg.sourceController.sources[sourceId].updateNotifications();
                     }
                 }, false);
+            });
+
+            $('.showOptionsView').click(function (ev) {
+                that.bg.extensionController.showOptionsView();
             });
         } catch (err) {
             console.error(err.stack);
