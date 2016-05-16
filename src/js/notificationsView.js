@@ -124,12 +124,14 @@ var notificationsView = new function () {
     this.toolbarTemplate = function () {
         try {
             var optUrl = mediator.getOptionsUrl();
-            var classes = 'toolbar';
             return [
-                '<div class="', classes, '">',
+                '<div class="toolbar">',
                     '<span class="showOptionsView cursorPointer">',
                         '<i class="fa fa-gear"></i>',
                         '<span class="toolbar-text">Options</span>',
+                    '</span>',
+                    '<span class="closePopup cursorPointer">',
+                        '<i class="fa fa-times"></i>',
                     '</span>',
                 '</div>'
             ].join('');
@@ -151,6 +153,10 @@ var notificationsView = new function () {
 
             $('.showOptionsView').click(function (ev) {
                 that.bg.extensionController.showOptionsView();
+            });
+
+            $('.closePopup').click(function (ev) {
+                window.close();
             });
         } catch (err) {
             console.error(err.stack);
