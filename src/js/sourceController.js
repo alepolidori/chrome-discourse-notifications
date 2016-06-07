@@ -90,6 +90,9 @@ var sourceController = new function () {
                     }
                 });
             }
+            if (optionsModel.isDesktopNotificationsSoundsEnabled() === true) {
+                util.playNotificationSound();
+            }
         } catch (err) {
             console.error(err.stack);
         }

@@ -6,15 +6,12 @@
     "manifest_version": 2,
     "default_locale": "en",
     "options_page": "html/options.html",
-    "options_ui": {
-        "page": "html/options.html",
-        "chrome_style": true
-    },
     "background": {
         "scripts": [
             "lib/async.js",
             "lib/jquery-2.1.4.min.js",
             "lib/message-bus-fix.js",
+            "src/js/util.js",
             "src/js/mediator.js",
             "src/js/chrDesktopNotificationsView.js",
             "src/js/Source.js",

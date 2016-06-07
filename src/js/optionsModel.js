@@ -168,6 +168,14 @@ var optionsModel = new function () {
         }
     };
 
+    this.isDesktopNotificationsSoundsEnabled = function () {
+        try {
+            return this.options.desktopNotificationsSoundEnabled;
+        } catch (err) {
+            console.error(err.stack);
+        }
+    };
+
     this.isOpenPagesBackgroundEnabled = function () {
         try {
             return this.options.openPagesBackgroundEnabled;
