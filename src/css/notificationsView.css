@@ -114,7 +114,7 @@ hr {
 }
 
 .toolbar {
-    line-height: 25px;
+    padding: 3px 0px;
     font-size: 1.5em;
     color: #919191;
 }
@@ -131,8 +131,8 @@ hr {
     cursor: pointer;
 }
 .closePopup {
-    float: right;
-    margin-right: 5px;
+    position: absolute;
+    right: 5px;
 }
 .showOptionsView {
     margin-left: 5px;
