@@ -8,6 +8,7 @@ var optionsView = new function () {
     this.$enableDesktopNotificationsChk;
     this.$enableDesktopNotificationsSoundChk;
     this.$openPagesBackgroundChk;
+    this.$playNotificationSoundBtn;
     this.$addSourceBtn;
     this.$addSourceInput;
     this.$sourceSpinner;
@@ -27,6 +28,7 @@ var optionsView = new function () {
             that.$openPagesBackgroundChk = $('#open-pages-background-chk');
             that.$enableDesktopNotificationsChk = $('#desktop-notifications-chk');
             that.$enableDesktopNotificationsSoundChk = $('#desktop-notifications-sound-chk');
+            that.$playNotificationSoundBtn = $('#play-notification-sound');
             that.$addSourceBtn = $('#add-source-btn');
             that.$addSourceInput = $('#add-source-input');
             that.$sourcesList = $('#sources-list');
@@ -43,6 +45,7 @@ var optionsView = new function () {
             that.$openPagesBackgroundChk.on('click', that.onEvtOpenPagesBackgroundClicked);
             that.$enableDesktopNotificationsChk.on('click', that.onEvtEnableDesktopNotificationsClicked);
             that.$enableDesktopNotificationsSoundChk.on('click', that.onEvtEnableDesktopNotificationsSoundClicked);
+            that.$playNotificationSoundBtn.on('click', that.onEvtPlayNotificationSound);
             that.$addSourceBtn.on('click', that.onEvtAddSource);
             that.$sourcesList.on('click', '.remove-source-btn', that.onEvtRemoveSource);
             that.$fontSizeRange.on('input', that.onEvtFontSizeRangeInput);
@@ -188,6 +191,15 @@ var optionsView = new function () {
                     that.unblockWaitingSourceInput();
                 }
             });
+        } catch (err) {
+            console.error(err.stack);
+            that.unblockWaitingSourceInput();
+        }
+    };
+
+    this.onEvtPlayNotificationSound = function () {
+        try {
+            util.playNotificationSound();
         } catch (err) {
             console.error(err.stack);
             that.unblockWaitingSourceInput();

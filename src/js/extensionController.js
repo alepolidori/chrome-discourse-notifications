@@ -61,7 +61,7 @@ var extensionController = new function () {
     this.removeExtensionBtnListeners = function () {
         try {
             mediator.setExtensionIconPopup({ popup: '' });
-            mediator.extensionIconOnClicked(this.showOptionsView);
+            mediator.extensionIconOnClicked(that.showOptionsView);
         } catch (err) {
             console.error(err.stack);
         }

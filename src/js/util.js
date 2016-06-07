@@ -17,7 +17,7 @@ var util = new function () {
 
     this.playNotificationSound = function () {
         try {
-            this.playSound('sounds/notify.mp3');
+            this.playSound('../sounds/notify.mp3');
         } catch (err) {
             console.error(err.stack);
         }
