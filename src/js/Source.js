@@ -253,7 +253,7 @@ var Source = function (url) {
                     setTimeout(function () { init(); }, that.USER_DATA_FAIL_TIMEOUT_POLLING);
                 }
                 else {
-                    that.mb = MessageBus();
+                    that.mb = MyMessageBus(window, document);
                     that.mb.baseUrl = [ that.url, '/' ].join('');
                     that.mb.start();
                     that.subscribeMbReceiveNotificationsCounters();
